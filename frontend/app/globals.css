@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-primary: #050816;
+  --color-bg-surface: rgba(255, 255, 255, 0.05);
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #9CA3AF;
+  --color-accent: #6C63FF;
+  --color-accent-alt: #00D4FF;
+  --color-authentic: #4ADE80;
+  --color-synthetic: #EF4444;
+  --color-inconclusive: #F59E0B;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: #050816;
+    --foreground: #FFFFFF;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased min-h-screen flex flex-col;
+  }
+}
+
+@layer utilities {
+  .aurora-bg {
+    background: radial-gradient(ellipse at top, rgba(108, 99, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(ellipse at bottom left, rgba(0, 212, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(ellipse at center right, rgba(124, 77, 255, 0.1) 0%, transparent 40%);
+    width: 100vw;
+    height: 100vh;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .glow-text {
+    text-shadow: 0 0 20px rgba(108, 99, 255, 0.5);
+  }
+  .animated-gradient-text {
+    background: linear-gradient(to right, #6C63FF, #00D4FF, #7C4DFF, #6C63FF);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 8s ease infinite;
+  }
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .scan-line {
+    background: linear-gradient(to bottom, transparent, rgba(108, 99, 255, 0.8), transparent);
+  }
+}
+
+* {
+  border-color: var(--color-border-subtle);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
