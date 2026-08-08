@@ -15,6 +15,7 @@ JobStage,
 StreamBreakdown,
 Verdict,
 VideoMetadata,
+UpdateInvestigationRequest,
 )
 from app.storage import frame_url
 from app.config import settings
@@ -58,6 +59,8 @@ async def get_full_result(
             file_size_bytes=job.file_size_bytes,
         ),
         frame_scores_url=f"{settings.PUBLIC_BASE_URL}/api/v1/results/{job_id}/frames",
+        investigation_status=job.investigation_status,
+        investigation_notes=job.investigation_notes,
     )
 @router.get("/{job_id}/frames", response_model=FrameListResponse)
 async def get_frame_scores(
@@ -151,6 +154,8 @@ async def export_result(
             for f in frames
         ],
         "created_at": result.created_at.isoformat(),
+        "investigation_status": job.investigation_status,
+        "investigation_notes": job.investigation_notes,
     }
     return Response(
         content=json.dumps(report, indent=2),
@@ -159,3 +164,17 @@ async def export_result(
             "Content-Disposition": f'attachment; filename="deepfake_report_{job_id[:8]}.json"'
         },
     )
+
+@router.patch("/{job_id}/investigation", response_model=FullResultResponse)
+async def update_investigation(
+    job_id: str,
+    update_data: UpdateInvestigationRequest,
+    db: AsyncSession = Depends(get_async_db),
+) -> FullResultResponse:
+    job, result = await _get_result_or_raise(job_id, db)
+    job.investigation_status = update_data.investigation_status
+    if update_data.investigation_notes is not None:
+        job.investigation_notes = update_data.investigation_notes
+    await db.commit()
+    await db.refresh(job)
+    return await get_full_result(job_id, db)

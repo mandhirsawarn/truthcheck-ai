@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, UserCircle } from "lucide-react";
+import { useRole, Role } from "@/context/RoleContext";
+
 export function Header() {
+  const { role, setRole } = useRole();
   return (
     <motion.header 
       initial={{ y: -100 }}
@@ -25,6 +28,10 @@ export function Header() {
           </div>
         </Link>
         <nav className="flex items-center gap-8 text-sm font-medium">
+          <Link href="/dashboard" className="text-text-secondary hover:text-white transition-colors relative group">
+            Dashboard
+            <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-accent transition-all duration-300 group-hover:w-full rounded-full"></span>
+          </Link>
           <Link href="/docs" className="text-text-secondary hover:text-white transition-colors relative group">
             Docs
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-accent transition-all duration-300 group-hover:w-full rounded-full"></span>
@@ -35,6 +42,19 @@ export function Header() {
           >
             Try Detector
           </Link>
+          
+          <div className="flex items-center gap-2 ml-4 pl-4 border-l border-white/10">
+            <UserCircle className="w-4 h-4 text-accent" />
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as Role)}
+              className="bg-transparent text-text-primary text-sm font-medium focus:outline-none focus:ring-0 cursor-pointer hover:text-white transition-colors [&>option]:bg-bg-surface"
+            >
+              <option value="Admin">Admin</option>
+              <option value="Investigator">Investigator</option>
+              <option value="Reviewer">Reviewer</option>
+            </select>
+          </div>
         </nav>
       </div>
     </motion.header>

@@ -1,5 +1,6 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RoleProvider } from "@/context/RoleContext";
 import { useState } from "react";
 export function Providers({ children }: { children: React.ReactNode }) {
 const [queryClient] = useState(
@@ -14,6 +15,8 @@ refetchOnWindowFocus: false,
 })
 );
 return (
+<RoleProvider>
 <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+</RoleProvider>
 );
 }

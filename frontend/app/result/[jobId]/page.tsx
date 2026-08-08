@@ -8,17 +8,36 @@ import { AlertTriangle, CheckCircle2, HelpCircle, Download, Activity, Cpu, Scan,
 import { Button } from "@/components/Button";
 import { formatDuration } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useRole } from "@/context/RoleContext";
+import { useUpdateInvestigation } from "@/lib/hooks";
+import { downloadCSV, downloadPDF } from "@/lib/exportUtils";
 
 export default function ResultPage(props: { params: Promise<{ jobId: string }> }) {
   const params = use(props.params);
-  const { data: result, isLoading, isError } = useFullResult(params.jobId);
+  const { data: result, isLoading, isError, refetch } = useFullResult(params.jobId);
   const [score, setScore] = useState(0);
+  const { role } = useRole();
+  const updateInvestigation = useUpdateInvestigation();
+
+  const [notes, setNotes] = useState("");
+  const [status, setStatus] = useState("Needs Review");
 
   useEffect(() => {
     if (result) {
       setTimeout(() => setScore(result.confidence), 300);
+      setNotes(result.investigation_notes || "");
+      setStatus(result.investigation_status || "Needs Review");
     }
   }, [result]);
+
+  const handleSaveInvestigation = async () => {
+    if (!result) return;
+    await updateInvestigation.mutateAsync({
+      jobId: params.jobId,
+      payload: { investigation_status: status, investigation_notes: notes }
+    });
+    refetch();
+  };
 
   if (isLoading) {
     return (
@@ -76,8 +95,11 @@ export default function ResultPage(props: { params: Promise<{ jobId: string }> }
               {isSynthetic ? "Our multi-modal engines have detected strong anomalies indicative of AI generation or deepfake manipulation." : "No significant synthetic artifacts were found. The footage exhibits natural spatial and temporal consistency."}
             </p>
             <div className="pt-4 flex gap-4">
-              <Button onClick={() => window.open(`http://localhost:8000/api/v1/results/${params.jobId}/export`, '_blank')}>
-                <Download className="w-4 h-4 mr-2" /> Download Full Report
+              <Button onClick={() => downloadPDF(result)}>
+                <Download className="w-4 h-4 mr-2" /> Download PDF
+              </Button>
+              <Button variant="outline" onClick={() => downloadCSV(result)}>
+                <Download className="w-4 h-4 mr-2" /> Download CSV
               </Button>
             </div>
           </motion.div>
@@ -139,6 +161,55 @@ export default function ResultPage(props: { params: Promise<{ jobId: string }> }
                   </motion.li>
                 ))}
               </ul>
+            </Card>
+
+            <h2 className="text-2xl font-semibold text-white mt-8 flex justify-between items-end">
+              <span>Investigation Details</span>
+              <span className="text-sm font-medium text-accent">Current Role: {role}</span>
+            </h2>
+            <Card className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary uppercase tracking-wider font-medium">Status</label>
+                {role === "Reviewer" ? (
+                  <div className="px-4 py-2 rounded-lg bg-bg-primary border border-border-subtle text-white font-medium">
+                    {result.investigation_status || "Needs Review"}
+                  </div>
+                ) : (
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="px-4 py-2 rounded-lg bg-bg-primary border border-border-subtle text-white focus:outline-none focus:border-accent"
+                  >
+                    <option value="Needs Review">Needs Review</option>
+                    <option value="Suspected">Suspected</option>
+                    <option value="Verified">Verified</option>
+                  </select>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary uppercase tracking-wider font-medium">Investigation Notes</label>
+                {role === "Reviewer" ? (
+                  <div className="px-4 py-3 rounded-lg bg-bg-primary border border-border-subtle text-text-primary whitespace-pre-wrap min-h-[100px]">
+                    {result.investigation_notes || "No notes added yet."}
+                  </div>
+                ) : (
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add forensic observations and case notes here..."
+                    className="px-4 py-3 rounded-lg bg-bg-primary border border-border-subtle text-white focus:outline-none focus:border-accent min-h-[100px] resize-y"
+                  />
+                )}
+              </div>
+
+              {role !== "Reviewer" && (
+                <div className="flex justify-end pt-2">
+                  <Button onClick={handleSaveInvestigation} disabled={updateInvestigation.isPending}>
+                    {updateInvestigation.isPending ? "Saving..." : "Save Investigation"}
+                  </Button>
+                </div>
+              )}
             </Card>
 
             <h2 className="text-2xl font-semibold text-white mt-8">Signal Streams Breakdown</h2>

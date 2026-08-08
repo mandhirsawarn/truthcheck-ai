@@ -58,6 +58,8 @@ class JobStatusResponse(BaseModel):
     completed_at: str | None = None
     verdict: Verdict | None = None
     confidence: float | None = None
+    investigation_status: str = "Needs Review"
+    investigation_notes: str | None = None
 class FrameScoreSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     frame_index: int
@@ -97,6 +99,8 @@ class FullResultResponse(BaseModel):
     faces_detected_in: int
     video: VideoMetadata
     frame_scores_url: str
+    investigation_status: str = "Needs Review"
+    investigation_notes: str | None = None
 class FrameListResponse(BaseModel):
     job_id: str
     total: int
@@ -121,3 +125,7 @@ class JobListResponse(BaseModel):
     page: int
     page_size: int
     jobs: list[JobStatusResponse]
+
+class UpdateInvestigationRequest(BaseModel):
+    investigation_status: str = Field(..., description="E.g., Verified, Suspected, Needs Review")
+    investigation_notes: str | None = Field(default=None)

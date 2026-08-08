@@ -20,6 +20,8 @@ def _job_to_status(job: Job) -> JobStatusResponse:
         completed_at=job.completed_at.isoformat() if job.completed_at else None,
         verdict=Verdict(result.verdict) if result else None,
         confidence=result.confidence if result else None,
+        investigation_status=job.investigation_status,
+        investigation_notes=job.investigation_notes,
     )
 @router.get("/jobs/{job_id}", response_model=JobStatusResponse)
 async def get_job_status(

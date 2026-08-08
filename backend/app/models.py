@@ -28,6 +28,10 @@ class Job(Base):
     )
     uploaded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    investigation_status: Mapped[str] = mapped_column(
+        String(32), default="Needs Review", nullable=False, index=True
+    )
+    investigation_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     result: Mapped["AnalysisResult | None"] = relationship(
         "AnalysisResult", back_populates="job", uselist=False, lazy="selectin"
     )
