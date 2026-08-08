@@ -18,5 +18,11 @@ try:
 except sqlite3.OperationalError as e:
     print("Error (might already exist):", e)
 
+try:
+    cursor.execute("ALTER TABLE jobs ADD COLUMN updated_at DATETIME;")
+    print("Added updated_at column.")
+except sqlite3.OperationalError as e:
+    print("Error (might already exist):", e)
+
 conn.commit()
 conn.close()

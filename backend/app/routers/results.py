@@ -61,6 +61,7 @@ async def get_full_result(
         frame_scores_url=f"{settings.PUBLIC_BASE_URL}/api/v1/results/{job_id}/frames",
         investigation_status=job.investigation_status,
         investigation_notes=job.investigation_notes,
+        updated_at=job.updated_at.isoformat() if job.updated_at else None,
     )
 @router.get("/{job_id}/frames", response_model=FrameListResponse)
 async def get_frame_scores(

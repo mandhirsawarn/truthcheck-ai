@@ -4,13 +4,14 @@ import { useFullResult } from "@/lib/hooks";
 import { Card } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { FrameStrip } from "@/components/FrameStrip";
-import { AlertTriangle, CheckCircle2, HelpCircle, Download, Activity, Cpu, Scan, Layers } from "lucide-react";
+import { AlertTriangle, CheckCircle2, HelpCircle, Download, Activity, Cpu, Scan, Layers, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/Button";
 import { formatDuration } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useRole } from "@/context/RoleContext";
 import { useUpdateInvestigation } from "@/lib/hooks";
 import { downloadCSV, downloadPDF } from "@/lib/exportUtils";
+import { Toast, ToastType } from "@/components/Toast";
 
 export default function ResultPage(props: { params: Promise<{ jobId: string }> }) {
   const params = use(props.params);
@@ -22,6 +23,11 @@ export default function ResultPage(props: { params: Promise<{ jobId: string }> }
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("Needs Review");
 
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<ToastType>("success");
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   useEffect(() => {
     if (result) {
       setTimeout(() => setScore(result.confidence), 300);
@@ -30,13 +36,31 @@ export default function ResultPage(props: { params: Promise<{ jobId: string }> }
     }
   }, [result]);
 
+  const showToast = (message: string, type: ToastType) => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 3000);
+  };
+
   const handleSaveInvestigation = async () => {
     if (!result) return;
-    await updateInvestigation.mutateAsync({
-      jobId: params.jobId,
-      payload: { investigation_status: status, investigation_notes: notes }
-    });
-    refetch();
+    try {
+      console.log("Saving investigation:", { investigation_status: status, investigation_notes: notes });
+      const response = await updateInvestigation.mutateAsync({
+        jobId: params.jobId,
+        payload: { investigation_status: status, investigation_notes: notes }
+      });
+      console.log("API response:", response);
+      console.log("Database update success");
+      setSaveSuccess(true);
+      showToast("Your investigation status and notes have been securely saved.", "success");
+      await refetch();
+      setTimeout(() => setSaveSuccess(false), 2000);
+    } catch (err) {
+      console.error("Database update failure:", err);
+      showToast("Please try again.", "error");
+    }
   };
 
   if (isLoading) {
@@ -77,6 +101,7 @@ export default function ResultPage(props: { params: Promise<{ jobId: string }> }
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="flex-grow flex flex-col relative">
+      <Toast message={toastMessage} type={toastType} isVisible={toastVisible} onClose={() => setToastVisible(false)} />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/10 blur-[150px] rounded-full pointer-events-none" />
       
       <div className="container mx-auto px-6 py-16 flex-grow z-10">
@@ -205,8 +230,22 @@ export default function ResultPage(props: { params: Promise<{ jobId: string }> }
 
               {role !== "Reviewer" && (
                 <div className="flex justify-end pt-2">
-                  <Button onClick={handleSaveInvestigation} disabled={updateInvestigation.isPending}>
-                    {updateInvestigation.isPending ? "Saving..." : "Save Investigation"}
+                  <Button 
+                    onClick={handleSaveInvestigation} 
+                    disabled={updateInvestigation.isPending || saveSuccess}
+                    className={saveSuccess ? "bg-authentic text-white border-authentic shadow-[0_0_20px_rgba(74,222,128,0.4)]" : ""}
+                  >
+                    {updateInvestigation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...
+                      </>
+                    ) : saveSuccess ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2" /> Saved
+                      </>
+                    ) : (
+                      "Save Investigation"
+                    )}
                   </Button>
                 </div>
               )}

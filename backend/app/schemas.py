@@ -60,6 +60,7 @@ class JobStatusResponse(BaseModel):
     confidence: float | None = None
     investigation_status: str = "Needs Review"
     investigation_notes: str | None = None
+    updated_at: str | None = None
 class FrameScoreSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     frame_index: int
@@ -101,6 +102,7 @@ class FullResultResponse(BaseModel):
     frame_scores_url: str
     investigation_status: str = "Needs Review"
     investigation_notes: str | None = None
+    updated_at: str | None = None
 class FrameListResponse(BaseModel):
     job_id: str
     total: int
