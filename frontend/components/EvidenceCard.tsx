@@ -24,7 +24,7 @@ export function EvidenceCard({ job }: { job: JobStatusResponse }) {
   const formattedDate = new Date(job.created_at).toLocaleString();
 
   return (
-    <Link href={job.stage === "completed" ? `/result/${job_id}` : `/processing/${job_id}`.replace("job_id", job.job_id)}>
+    <Link href={job.stage === "completed" ? `/result/${job.job_id}` : `/processing/${job.job_id}`}>
       <Card className="flex flex-col gap-4 hover:border-accent transition-colors cursor-pointer group">
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-1">

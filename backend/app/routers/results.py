@@ -176,5 +176,5 @@ async def update_investigation(
     if update_data.investigation_notes is not None:
         job.investigation_notes = update_data.investigation_notes
     await db.commit()
-    await db.refresh(job)
+    
     return await get_full_result(job_id, db)

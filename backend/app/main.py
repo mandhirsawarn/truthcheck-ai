@@ -9,7 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from app.config import settings
-from app.db import create_all_tables
+from app.db import create_all_tables, AsyncSessionLocal
+from app.seed import seed_if_empty
 from app.exceptions import DeepfakeAPIError
 from app.middleware import RateLimitMiddleware, RequestIDMiddleware, TimingMiddleware
 from app.routers import analyze, status, websocket, results, uploads
@@ -39,6 +40,10 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("Starting Deepfake Detection API")
     await create_all_tables()
+    
+    async with AsyncSessionLocal() as session:
+        await seed_if_empty(session)
+        
     settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     logger.info("Database tables ready: %s", settings.DATABASE_URL)
     await start_worker_pool()
