@@ -179,5 +179,27 @@ The SQLite database is automatically provisioned and migrated on startup. A demo
 
 ## 10. Team
 
-**Team Xieron**  
-*Hackathon Project*
+## 👥 Team Xieron
+
+| Name | Role | Responsibilities |
+|------|------|------------------|
+| **Mandhir Sawarn** | **Project Lead • Full Stack Developer • AI Integration** | Led the project development, designed the overall architecture, integrated the AI detection pipeline, developed major frontend and backend features, implemented the investigation workflow, coordinated team contributions, managed GitHub, documentation, testing, deployment, and project presentation. |
+| **Aditya Kumar** | Backend & AI Developer | Assisted with backend development, API integration, AI model support, testing, and debugging. |
+| **Nimish** | Frontend Developer | Assisted with frontend components, UI improvements, responsive design, and testing. |
+| **Sumit** | Database & Testing | Assisted with database management, application testing, debugging, and validation of investigation workflows. |
+
+---
+
+## Team Contributions
+
+TruthCheck AI was collaboratively developed during the hackathon under the theme **"Fortress Protocol: Cybersecurity, Privacy & Digital Resilience."**
+
+Mandhir Sawarn led the overall development and system integration, while the team collaborated on backend development, frontend improvements, testing, database management, debugging, documentation, and project validation to deliver a complete AI-powered Digital Forensics Investigation Platform.
+
+---
+
+## Acknowledgements
+
+Built with ❤️ by **Team Xieron** during the Hackathon.
+
+We thank the organizers for providing an opportunity to build a practical AI-powered cybersecurity solution focused on digital trust, investigation workflows, and responsible AI.
